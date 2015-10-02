@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace RadiusTest
@@ -13,8 +14,11 @@ namespace RadiusTest
         public static async Task Start()
         {
             var client = new UdpClient(1812);
-            var result = await client.ReceiveAsync();
-            System.Console.WriteLine("{0}: {1} bytes", result.RemoteEndPoint.Address, result.Buffer.Length);
+            while (true)
+            {
+                var result = await client.ReceiveAsync();
+                Console.WriteLine("{0}: {1} bytes", result.RemoteEndPoint.Address, result.Buffer.Length);
+            }
         }
     }
 }
