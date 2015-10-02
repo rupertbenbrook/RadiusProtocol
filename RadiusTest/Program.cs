@@ -58,11 +58,10 @@ namespace RadiusTest
                 var attrib = new RadiusAttribute
                 {
                     Type = (RadiusAttributeType)buffer[pos],
-                    Length = buffer[pos + 1],
                     Value = buffer.Segment(pos + 2, buffer[pos + 1] - 2)
                 };
                 packet.Attributes.Add(attrib);
-                pos += attrib.Length;
+                pos += buffer[pos + 1];
             }
             return packet;
         }
@@ -145,7 +144,10 @@ namespace RadiusTest
     public class RadiusAttribute
     {
         public RadiusAttributeType Type { get; set; }
-        public byte Length { get; set; }
+        public byte Length
+        {
+            get { return (byte)(1 + Value.Length); }
+        }
         public byte[] Value { get; set; }
     }
 
