@@ -4,6 +4,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
+// https://tools.ietf.org/html/rfc2865
+
 namespace RadiusTest
 {
     public class Program
@@ -36,7 +38,7 @@ namespace RadiusTest
             }
             var packet = new RadiusPacket
             {
-                Code = buffer[0],
+                Code = (RadiusPacketCode)buffer[0],
                 Identifier = buffer[1],
                 Length = BitConverter.ToUInt16(buffer.ReverseSegment(2, 2), 0),
                 Authenticator = buffer.Segment(4, 16)
@@ -47,7 +49,7 @@ namespace RadiusTest
             {
                 var attrib = new RadiusAttribute
                 {
-                    Type = buffer[pos],
+                    Type = (RadiusAttributeType)buffer[pos],
                     Length = buffer[pos + 1],
                     Value = buffer.Segment(pos + 2, buffer[pos + 1] - 2)
                 };
@@ -59,9 +61,67 @@ namespace RadiusTest
         }
     }
 
+    public enum RadiusPacketCode : byte
+    {
+        AccessRequest = 1,
+        AccessAccept = 2,
+        AccessReject = 3,
+        AccountingRequest = 4,
+        AccountingResponse = 5,
+        AccessChallenge = 11,
+        StatusServer = 12,
+        StatusClient = 13,
+        Reserved = 255
+    }
+
+    public enum RadiusAttributeType : byte
+    {
+        UserName = 1,
+        UserPassword = 2,
+        CHAPPassword = 3,
+        NASIPAddress = 4,
+        NASPort = 5,
+        ServiceType = 6,
+        FramedProtocol = 7,
+        FramedIPAddress = 8,
+        FramedIPNetmask = 9,
+        FramedRouting = 10,
+        FilterId = 11,
+        FramedMTU = 12,
+        FramedCompression = 13,
+        LoginIPHost = 14,
+        LoginService = 15,
+        LoginTCPPort = 16,
+        ReplyMessage = 18,
+        CallbackNumber = 19,
+        CallbackId = 20,
+        FramedRoute = 22,
+        FramedIPXNetwork = 23,
+        State = 24,
+        Class = 25,
+        VendorSpecific = 26,
+        SessionTimeout = 27,
+        IdleTimeout = 28,
+        TerminationAction = 29,
+        CalledStationId = 30,
+        CallingStationId = 31,
+        NASIdentifier = 32,
+        ProxyState = 33,
+        LoginLATService = 34,
+        LoginLATNode = 35,
+        LoginLATGroup = 36,
+        FramedAppleTalkLink = 37,
+        FramedAppleTalkNetwork = 38,
+        FramedAppleTalkZone = 39,
+        CHAPChallenge = 60,
+        NASPortType = 61,
+        PortLimit = 62,
+        LoginLATPort = 63,
+    }
+
     public class RadiusPacket
     {
-        public byte Code { get; set; }
+        public RadiusPacketCode Code { get; set; }
         public byte Identifier { get; set; }
         public ushort Length { get; set; }
         public byte[] Authenticator { get; set; }
@@ -70,7 +130,7 @@ namespace RadiusTest
 
     public class RadiusAttribute
     {
-        public byte Type { get; set; }
+        public RadiusAttributeType Type { get; set; }
         public byte Length { get; set; }
         public byte[] Value { get; set; }
     }
@@ -95,7 +155,7 @@ namespace RadiusTest
                 builder.AppendFormat("{0}[{1}]: ", valType.GetElementType(), array.Length);
                 foreach (var item in array)
                 {
-                    builder.Append(item);
+                    builder.Append(item.Dump());
                     builder.Append(", ");
                 }
                 builder.Length = builder.Length - 2;
