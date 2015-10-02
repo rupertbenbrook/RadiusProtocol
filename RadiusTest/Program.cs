@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
@@ -28,9 +29,10 @@ namespace RadiusTest
             {
                 var result = await client.ReceiveAsync();
                 var request = serializer.Read(result.Buffer);
+                Console.WriteLine(request.Dump());
                 if (request.Code == RadiusPacketCode.AccessRequest)
                 {
-                    var password = request.Attributes.FirstOrDefault(a => a.Type == RadiusAttributeType.UserPassword);
+                    var password = (RadiusBinaryAttribute)request.Attributes.FirstOrDefault(a => a.Type == RadiusAttributeType.UserPassword);
                     var code = ((password == null) || (string.Compare(DecodePassword(Secret, request.Authenticator, password.Value), Password, StringComparison.InvariantCulture) != 0))
                         ? RadiusPacketCode.AccessReject
                         : RadiusPacketCode.AccessAccept;

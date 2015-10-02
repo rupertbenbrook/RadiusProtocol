@@ -19,7 +19,7 @@ namespace RadiusTest
             var pos = 20;
             while (pos < buffer.Length)
             {
-                var attrib = new RadiusAttribute
+                var attrib = new RadiusBinaryAttribute
                 {
                     Type = (RadiusAttributeType)buffer[pos],
                     Value = buffer.Segment(pos + 2, buffer[pos + 1] - 2)
