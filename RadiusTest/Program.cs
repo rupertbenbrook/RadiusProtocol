@@ -1,15 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace RadiusTest
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            Start().Wait();
+        }
+
+        public static async Task Start()
+        {
+            var client = new UdpClient(1812);
+            var result = await client.ReceiveAsync();
+            System.Console.WriteLine("{0}: {1} bytes", result.RemoteEndPoint.Address, result.Buffer.Length);
         }
     }
 }
