@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,14 @@ namespace RadiusTest
             {
                 var result = await client.ReceiveAsync();
                 var packet = reader.Read(result.Buffer);
+                if (packet.Code == RadiusPacketCode.AccessRequest)
+                {
+                    var response = new RadiusPacket
+                    {
+                        Code = RadiusPacketCode.AccessAccept,
+                        Identifier = packet.Identifier,
+                    };
+                }
                 Console.WriteLine(packet.Dump());
             }
         }
@@ -40,10 +50,8 @@ namespace RadiusTest
             {
                 Code = (RadiusPacketCode)buffer[0],
                 Identifier = buffer[1],
-                Length = BitConverter.ToUInt16(buffer.ReverseSegment(2, 2), 0),
                 Authenticator = buffer.Segment(4, 16)
             };
-            var attribs = new List<RadiusAttribute>();
             var pos = 20;
             while (pos < buffer.Length)
             {
@@ -53,10 +61,9 @@ namespace RadiusTest
                     Length = buffer[pos + 1],
                     Value = buffer.Segment(pos + 2, buffer[pos + 1] - 2)
                 };
-                attribs.Add(attrib);
+                packet.Attributes.Add(attrib);
                 pos += attrib.Length;
             }
-            packet.Attributes = attribs.ToArray();
             return packet;
         }
     }
@@ -121,11 +128,18 @@ namespace RadiusTest
 
     public class RadiusPacket
     {
+        private readonly List<RadiusAttribute> _attributes = new List<RadiusAttribute>();
         public RadiusPacketCode Code { get; set; }
         public byte Identifier { get; set; }
-        public ushort Length { get; set; }
+        public ushort Length
+        {
+            get { return (ushort)(20 + Attributes.Sum(a => a.Length)); }
+        }
         public byte[] Authenticator { get; set; }
-        public RadiusAttribute[] Attributes { get; set; }
+        public IList<RadiusAttribute> Attributes
+        {
+            get { return _attributes; }
+        }
     }
 
     public class RadiusAttribute
@@ -140,35 +154,52 @@ namespace RadiusTest
         public static string Dump(this object value)
         {
             var builder = new StringBuilder();
+            DumpInternal(builder, value, 0);
+            return builder.ToString();
+        }
+
+        public static void DumpInternal(StringBuilder builder, object value, int depth)
+        {
             if (value == null)
             {
-                return "<null>";
+                builder.Append("<null>");
+                return;
             }
             var valType = value.GetType();
             if (valType.IsValueType)
             {
-                return value.ToString();
+                builder.Append(value.ToString());
+                return;
             }
-            if (valType.IsArray)
+            builder.Append(valType);
+            builder.AppendLine(" {");
+            int lastValue = builder.Length;
+            if (typeof(IEnumerable).IsAssignableFrom(valType))
             {
-                var array = (Array)value;
-                builder.AppendFormat("{0}[{1}]: ", valType.GetElementType(), array.Length);
-                foreach (var item in array)
+                foreach (var item in (IEnumerable)value)
                 {
-                    builder.Append(item.Dump());
-                    builder.Append(", ");
+                    builder.Append(new string(' ', depth + 1));
+                    DumpInternal(builder, item, depth + 1);
+                    lastValue = builder.Length;
+                    builder.AppendLine(",");
                 }
-                builder.Length = builder.Length - 2;
-                return builder.ToString();
-            }
-            foreach (var prop in value.GetType().GetProperties())
-            {
-                builder.Append(prop.Name);
-                builder.Append(": ");
-                builder.Append(prop.GetValue(value).Dump());
+                builder.Length = lastValue;
                 builder.AppendLine();
+                builder.Append(new string(' ', depth) + "}");
+                return;
             }
-            return builder.ToString();
+            foreach (var prop in valType.GetProperties())
+            {
+                builder.Append(new string(' ', depth + 1));
+                builder.Append(prop.Name);
+                builder.Append(" = ");
+                DumpInternal(builder, prop.GetValue(value), depth + 1);
+                lastValue = builder.Length;
+                builder.AppendLine(",");
+            }
+            builder.Length = lastValue;
+            builder.AppendLine();
+            builder.Append(new string(' ', depth) + "}");
         }
 
         public static T[] Segment<T>(this T[] array, int offset, int count)
