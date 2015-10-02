@@ -26,6 +26,13 @@ namespace RadiusTest
                 builder.Append(value);
                 return;
             }
+            if (valType == typeof (string))
+            {
+                builder.Append('"');
+                builder.Append(value);
+                builder.Append('"');
+                return;
+            }
             builder.Append(valType);
             builder.AppendLine(" {");
             int lastValue = builder.Length;

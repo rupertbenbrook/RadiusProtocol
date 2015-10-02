@@ -48,6 +48,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RadiusAttribute.cs" />
     <Compile Include="RadiusAttributeType.cs" />
+    <Compile Include="RadiusAttributeTypeAttribute.cs" />
     <Compile Include="RadiusBinaryAttribute.cs" />
     <Compile Include="RadiusPacket.cs" />
     <Compile Include="RadiusPacketCode.cs" />
