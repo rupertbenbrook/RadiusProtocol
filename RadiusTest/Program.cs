@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 // https://en.wikipedia.org/wiki/RADIUS
 // https://tools.ietf.org/html/rfc2865
+// http://www.iana.org/assignments/radius-types/radius-types.xhtml
 
 namespace RadiusTest
 {
