@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace RadiusTest
+namespace RadiusProtocol
 {
     [RadiusAttributeType(RadiusAttributeType.NasIpAddress)]
     [RadiusAttributeType(RadiusAttributeType.FramedIpAddress)]

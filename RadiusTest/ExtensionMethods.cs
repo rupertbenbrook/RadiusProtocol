@@ -80,18 +80,5 @@ namespace RadiusTest
                 builder.AppendLine("*** EXCEPTION ***");
             }
         }
-
-        public static T[] Segment<T>(this T[] array, int offset, int count)
-        {
-            var segment = new T[count];
-            Buffer.BlockCopy(array, offset, segment, 0, count);
-            return segment;
-        }
-        public static T[] ReverseSegment<T>(this T[] array, int offset, int count)
-        {
-            var segment = array.Segment(offset, count);
-            Array.Reverse(segment);
-            return segment;
-        }
     }
 }

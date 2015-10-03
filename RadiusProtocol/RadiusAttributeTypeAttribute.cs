@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RadiusTest
+namespace RadiusProtocol
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public class RadiusAttributeTypeAttribute : Attribute

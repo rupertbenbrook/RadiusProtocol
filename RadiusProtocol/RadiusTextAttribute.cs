@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace RadiusTest
+namespace RadiusProtocol
 {
     [RadiusAttributeType(RadiusAttributeType.UserName)]
     [RadiusAttributeType(RadiusAttributeType.FilterId)]

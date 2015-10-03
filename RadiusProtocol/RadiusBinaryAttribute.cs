@@ -1,4 +1,4 @@
-namespace RadiusTest
+namespace RadiusProtocol
 {
     [RadiusAttributeType(RadiusAttributeType.UserPassword)]
     public class RadiusBinaryAttribute : RadiusAttribute<byte[]>

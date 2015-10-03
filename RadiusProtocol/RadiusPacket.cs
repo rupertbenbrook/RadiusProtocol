@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RadiusTest
+namespace RadiusProtocol
 {
     public class RadiusPacket
     {

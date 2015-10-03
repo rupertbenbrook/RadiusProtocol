@@ -1,4 +1,4 @@
-namespace RadiusTest
+namespace RadiusProtocol
 {
     public enum RadiusAttributeType : byte
     {
