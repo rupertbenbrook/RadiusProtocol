@@ -6,6 +6,11 @@ namespace RadiusTest
         public byte Length => (byte)(1 + ValueLength);
         protected abstract byte ValueLength { get; }
         public abstract void SetValueFromBuffer(byte[] buffer);
+
+        public override string ToString()
+        {
+            return "[" + Type + "]";
+        }
     }
 
     public abstract class RadiusAttribute<T> : RadiusAttribute

@@ -28,23 +28,30 @@ namespace RadiusTest
             var serializer = new RadiusPacketSerializer();
             while (true)
             {
-                var result = await client.ReceiveAsync();
-                var request = serializer.Read(result.Buffer);
-                Console.WriteLine(request.Dump());
-                if (request.Code == RadiusPacketCode.AccessRequest)
+                try
                 {
-                    var password = (RadiusBinaryAttribute)request.Attributes.FirstOrDefault(a => a.Type == RadiusAttributeType.UserPassword);
-                    var code = ((password == null) || (string.Compare(DecodePassword(Secret, request.Authenticator, password.Value), Password, StringComparison.InvariantCulture) != 0))
-                        ? RadiusPacketCode.AccessReject
-                        : RadiusPacketCode.AccessAccept;
-                    var response = new RadiusPacket
+                    var result = await client.ReceiveAsync();
+                    var request = serializer.Read(result.Buffer);
+                    Console.WriteLine(request.Dump());
+                    if (request.Code == RadiusPacketCode.AccessRequest)
                     {
-                        Code = code,
-                        Identifier = request.Identifier,
-                        Authenticator = request.Authenticator
-                    };
-                    var buffer = serializer.Write(response);
-                    await client.SendAsync(buffer, buffer.Length, result.RemoteEndPoint);
+                        var password = (RadiusBinaryAttribute)request.Attributes.FirstOrDefault(a => a.Type == RadiusAttributeType.UserPassword);
+                        var code = ((password == null) || (string.Compare(DecodePassword(Secret, request.Authenticator, password.Value), Password, StringComparison.InvariantCulture) != 0))
+                            ? RadiusPacketCode.AccessReject
+                            : RadiusPacketCode.AccessAccept;
+                        var response = new RadiusPacket
+                        {
+                            Code = code,
+                            Identifier = request.Identifier,
+                            Authenticator = request.Authenticator
+                        };
+                        var buffer = serializer.Write(response);
+                        await client.SendAsync(buffer, buffer.Length, result.RemoteEndPoint);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
                 }
             }
         }

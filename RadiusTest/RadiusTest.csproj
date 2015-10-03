@@ -50,6 +50,7 @@
     <Compile Include="RadiusAttributeType.cs" />
     <Compile Include="RadiusAttributeTypeAttribute.cs" />
     <Compile Include="RadiusBinaryAttribute.cs" />
+    <Compile Include="RadiusIpAddressAttribute.cs" />
     <Compile Include="RadiusPacket.cs" />
     <Compile Include="RadiusPacketCode.cs" />
     <Compile Include="RadiusPacketSerializer.cs" />

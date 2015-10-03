@@ -8,5 +8,10 @@ namespace RadiusTest
         {
             Value = buffer;
         }
+
+        public override string ToString()
+        {
+            return base.ToString() + ": byte[" + ValueLength + "]";
+        }
     }
 }
